@@ -1,0 +1,15 @@
+[package]
+name = "vcf2csv"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "vcf2csv"
+crate-type = ["cdylib"]
+
+[dependencies]
+bio-types = "1.0.1"
+itertools = "0.11.0"
+pyo3 = "0.19.0"
+rust-htslib = "0.44.1"
