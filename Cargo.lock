@@ -12,6 +12,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.75"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -23,7 +29,7 @@ version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d45749b87f21808051025e9bf714d14ff4627f9d8ca967eade6946ea769aa4a"
 dependencies = [
- "derive-new",
+ "derive-new 0.5.9",
  "lazy_static",
  "regex",
  "strum_macros",
@@ -108,6 +114,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "derive-new"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d150dea618e920167e5973d70ae6ece4385b7164e0d799fe7c122dd0a5d912ad"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -356,6 +373,7 @@ version = "0.19.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e681a6cfdc4adcc93b4d3cf993749a4552018ee0a9b65fc0ccfad74352c72a38"
 dependencies = [
+ "anyhow",
  "cfg-if",
  "indoc",
  "libc",
@@ -472,7 +490,7 @@ dependencies = [
  "bio-types",
  "byteorder",
  "custom_derive",
- "derive-new",
+ "derive-new 0.5.9",
  "hts-sys",
  "ieee754",
  "lazy_static",
@@ -635,10 +653,13 @@ dependencies = [
 name = "vcf2csv"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bio-types",
+ "derive-new 0.6.0",
  "itertools",
  "pyo3",
  "rust-htslib",
+ "thiserror",
 ]
 
 [[package]]

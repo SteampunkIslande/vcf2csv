@@ -9,7 +9,10 @@ name = "vcf2csv"
 crate-type = ["cdylib"]
 
 [dependencies]
+anyhow = "1.0.75"
 bio-types = "1.0.1"
+derive-new = "0.6.0"
 itertools = "0.11.0"
-pyo3 = "0.19.0"
+pyo3 = { version="0.19.0", features=["anyhow"]}
 rust-htslib = "0.44.1"
+thiserror = "1.0.50"
