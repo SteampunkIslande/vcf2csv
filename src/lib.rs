@@ -204,6 +204,16 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
                 }
             }
 
+            let genotypes = {
+                let genotypes = rec.genotypes()?;
+
+                Some(
+                    (0..reader.header().sample_count() as usize)
+                        .map(|s| format!("{}", genotypes.get(s)))
+                        .collect_vec()
+                )
+            };
+
             for s in 0..reader.header().sample_count() as usize {
                 for name in format_tags.iter() {
                     let _name = name.as_bytes();
@@ -239,12 +249,22 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
                                 writer.write_field(field.as_bytes())?;
                             }
                             bcf::header::TagType::String => {
-                                let field = if let Ok(v) = rec.format(_name).string() {
-                                    v[s]
+                                if _name != b"GT" {
+                                    if let Ok(v) = rec.format(_name).string() {
+                                        writer.write_field(
+                                            std::str::from_utf8(v[s]).unwrap_or("").as_bytes()
+                                        )?;
+                                    } else {
+                                        writer.write_field(b"")?;
+                                    }
                                 } else {
-                                    b""
-                                };
-                                writer.write_field(field)?;
+                                    //Treat genotypes different
+                                    if let Some(ref gt) = genotypes {
+                                        writer.write_field(gt[s].as_bytes())?;
+                                    } else {
+                                        writer.write_field(b"")?;
+                                    }
+                                }
                             }
                         }
                     } else {
