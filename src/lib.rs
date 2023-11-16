@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use rust_htslib::bcf::record::GenotypeAllele;
 use rust_htslib::{ bcf, bcf::Read, bcf::HeaderRecord };
 
 use std::fs::File;
@@ -82,8 +83,6 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
         ))
         .collect();
 
-    println!("{:?}", format_tags);
-
     let common_n = 6 + info_tags.len();
 
     writer.write_field(HEADER_COMMON)?;
@@ -164,7 +163,6 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
                             bcf::header::TagLength::AltAlleles => Ok(i),
                             bcf::header::TagLength::Alleles => Ok(i + 1),
                             bcf::header::TagLength::Variable => Ok(0),
-                            bcf::header::TagLength::Genotypes => Ok(0),
                             _ => Err(Box::new(ParseError::UnsupportedTagLength)),
                         }
                     };
@@ -209,7 +207,7 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
 
                 Some(
                     (0..reader.header().sample_count() as usize)
-                        .map(|s| format!("{}", genotypes.get(s)))
+                        .map(|s| genotypes.get(s))
                         .collect_vec()
                 )
             };
@@ -222,6 +220,7 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
                             bcf::header::TagLength::Fixed(_) => 0,
                             bcf::header::TagLength::AltAlleles => i,
                             bcf::header::TagLength::Alleles => i + 1,
+                            bcf::header::TagLength::Genotypes => i + 1,
                             _ => bail!(ParseError::UnsupportedTagLength),
                         };
 
@@ -260,7 +259,39 @@ pub fn to_txt(vcf_path: &str, csv_path: &str) -> anyhow::Result<()> {
                                 } else {
                                     //Treat genotypes different
                                     if let Some(ref gt) = genotypes {
-                                        writer.write_field(gt[s].as_bytes())?;
+                                        let genotype = &gt[s];
+                                        let default_allele = GenotypeAllele::UnphasedMissing;
+                                        let gt_repr = match
+                                            (
+                                                *genotype.get(0).unwrap_or(&default_allele),
+                                                *genotype.get(1).unwrap_or(&default_allele),
+                                            )
+                                        {
+                                            (a1, a2) => {
+                                                format!(
+                                                    "{}{}{}",
+                                                    match a1.index() {
+                                                        Some(0) => "0",
+                                                        Some(i_) if i_ == (i as u32) => "1",
+                                                        Some(_) => ".",
+                                                        None => ".",
+                                                    },
+                                                    match a2 {
+                                                        | GenotypeAllele::Phased(_)
+                                                        | GenotypeAllele::PhasedMissing => "|",
+                                                        | GenotypeAllele::Unphased(_)
+                                                        | GenotypeAllele::UnphasedMissing => "/",
+                                                    },
+                                                    match a2.index() {
+                                                        Some(0) => "0",
+                                                        Some(i_) if i_ == (i as u32) => "1",
+                                                        Some(_) => ".",
+                                                        None => ".",
+                                                    }
+                                                )
+                                            }
+                                        };
+                                        writer.write_field(gt_repr.as_bytes())?;
                                     } else {
                                         writer.write_field(b"")?;
                                     }
