@@ -1,0 +1,10 @@
+##fileformat=VCFv4.2
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##FORMAT=<ID=GT,Number=G,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth for this sample">
+##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality for this sample">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	Sample1	Sample2	Sample3
+chr1	100	.	A	G,T	20	PASS	DP=30	GT:DP:GQ	0|0:10:15	0/1:10:67.5	0|2:10:32
+chr1	200	.	C	A,G	30	PASS	DP=25	GT:DP:GQ	1/2:10:.	0|2:10:92	1/1:5:13
+chr1	300	.	G	T	25	PASS	DP=40	GT:DP:GQ	0/1:30:16	1/0:5:48	1|0:5:77
+chr1	400	.	A	T,CA	25	PASS	DP=40	GT:DP:GQ	0/1:20:5	1/2:10:40	.|.:10:20
